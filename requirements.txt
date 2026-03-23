@@ -1,0 +1,15 @@
+# Web Crawler Dependencies
+# Install with: pip install -r requirements.txt
+
+# Async HTTP client for concurrent web requests
+aiohttp>=3.8.0
+
+# Fast HTML parser for link extraction
+selectolax>=0.3.0
+
+# Graph data structure and visualization
+networkx>=3.0
+matplotlib>=3.5.0
+
+# Data processing for CSV handling
+pandas>=1.5.0
