@@ -95,18 +95,18 @@ for i in range(depth):  # For each level
 
 #### Key Features
 
-✅ **Simple and easy to understand** - minimal code  
-✅ **Works** - fetches pages and builds a graph  
-✅ **Uses aiohttp** - async HTTP library  
-✅ **Per-domain rate limiting** - doesn't hammer one domain  
+ **Simple and easy to understand** - minimal code  
+ **Works** - fetches pages and builds a graph  
+ **Uses aiohttp** - async HTTP library  
+ **Per-domain rate limiting** - doesn't hammer one domain  
 
 #### Limitations
 
-❌ **Hardcoded settings** - can't easily change parameters  
-❌ **URL filtering is too strict** - only accepts `https://` links, rejects relative links  
-❌ **No URL normalization** - treats `example.com/page` and `example.com/page/` as different  
-❌ **Weak deduplication** - URLs only marked as visited after successful fetch  
-❌ **No depth controls** - visits all links without domain restrictions  
+ **Hardcoded settings** - can't easily change parameters  
+ **URL filtering is too strict** - only accepts `https://` links, rejects relative links  
+ **No URL normalization** - treats `example.com/page` and `example.com/page/` as different  
+ **Weak deduplication** - URLs only marked as visited after successful fetch  
+ **No depth controls** - visits all links without domain restrictions  
 
 ---
 
@@ -267,22 +267,22 @@ main() - uses config everywhere
 ```
 
 **Asyncio.py finds:**
-- ✅ `https://example.com/page1`
-- ❌ `/page2` (relative, rejected)
-- ✅ `https://other-site.com/news`
-- ❌ `#section` (starts with #)
-- ❌ `javascript:...` (caught by exception)
-- ❌ Duplicate due to case difference
+- (Yes) `https://example.com/page1`
+- (No) `/page2` (relative, rejected)
+- (Yes) `https://other-site.com/news`
+- (No) `#section` (starts with #)
+- (No) `javascript:...` (caught by exception)
+- (No) Duplicate due to case difference
 
 **Result:** 2 links, misses internal link
 
 **Asyncio_Mod.py finds:**
-- ✅ `https://example.com/page1`
-- ✅ `https://example.com/page2` (resolved!)
-- ✅ `https://other-site.com/news`
-- ❌ `#section` (filtered)
-- ❌ `javascript:...` (filtered)
-- ✅ Detects duplicate (normalized to same URL)
+- (Yes) `https://example.com/page1`
+- (Yes) `https://example.com/page2` (resolved!)
+- (Yes) `https://other-site.com/news`
+- (No) `#section` (filtered)
+- (No) `javascript:...` (filtered)
+- (Yes) Detects duplicate (normalized to same URL)
 
 **Result:** 3 unique links, found internal link!
 
