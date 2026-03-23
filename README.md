@@ -35,6 +35,8 @@ The work has been distributed across all milestones. For each milestone, each me
 | Milestone | Responsibilities |
 |-----------|-----------------|
 | Milestone #1 | - Ray cluster setup and configuration <br> - URL Frontier Manager (Ray Actor) implementation <br> - Visited URL tracking with deduplication <br> - Depth/domain constraint enforcement <br> - URL normalization utilities <br> - Configuration management system |
+| Milestone #2 | - PageRank coordinator implementation <br> - Iteration control and synchronization barriers <br> - Convergence detection logic <br> - Centralized aggregation strategy <br> - Worker task orchestration |
+| Milestone #3 | - Incremental update coordinator <br> - Experiment orchestration framework <br> - System configuration for different scenarios <br> - Integration of all components <br> - Incremental graph updates <br> - Delta computation for new pages <br> - Affected subgraph identification <br> - Parallel delta processing |
 
 ---
 
@@ -44,8 +46,8 @@ The work has been distributed across all milestones. For each milestone, each me
 |-----------|-----------------|
 | Milestone #1 | - Fetch & Parse workers (Ray tasks) <br> - HTTP request handling with error recovery <br> - HTML parsing and link extraction <br> - Rate limiting and politeness delays <br> - Robots.txt compliance (optional) <br> - Retry logic for failed requests |
 | Milestone #2 | - Graph partitioning algorithms <br> - Data distribution across workers <br> - Load balancing strategies <br> - Partition quality metrics <br> - Communication pattern optimization |
-| Milestone #2 | - PageRank coordinator implementation <br> - Iteration control and synchronization barriers <br> - Convergence detection logic <br> - Centralized aggregation strategy <br> - Worker task orchestration |
-| Milestone #3 | - Incremental update coordinator <br> - Experiment orchestration framework <br> - System configuration for different scenarios <br> - Integration of all components <br> - Incremental graph updates <br> - Delta computation for new pages <br> - Affected subgraph identification <br> - Parallel delta processing |
+| Milestone #3 | - Incremental graph updates  <br> - Delta computation for new pages <br> - Affected subgraph identification  <br> - Parallel delta processing |
+
 
 ---
 
