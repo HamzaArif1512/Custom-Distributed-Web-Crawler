@@ -1,96 +1,53 @@
-# Web Crawler Project (Milestone 1)
+# Parallel PageRank Project (Milestone 2)
 
 ## Overview
-This repository contains Milestone 1 work for a web crawler project focused on parallel and distributed crawling performance.
+This repository contains Milestone 2 work focused on parallel and distributed PageRank computation.
 
-The project compares three crawler designs:
-- Sequential crawler
-- Ray Master-Worker crawler
-- Ray Peer-to-Peer crawler
+The project implements and benchmarks three PageRank strategies on a real web-crawl graph:
+- **Sequential**: Single-process, single-thread baseline.
+- **Centralized Aggregation (Ray)**: Workers compute chunks; a centralized driver aggregates results.
+- **Distributed Reduction (Ray)**: Workers compute chunks; a tree-reduction step merges results directly across workers without driver involvement.
 
-The main goal is to measure speed and throughput differences against a sequential baseline while building a crawl graph.
+The main goal is to evaluate the execution time, speedup, and communication overhead of these strategies under different termination policies.
 
 ## What Is Included
-- Ray-based parallelization experiments for Milestone 1
-- Sequential baseline implementation for performance comparison
-- Asyncio-based crawler experiments (supporting exploration; not required for Milestone 1 submission criteria)
-- Benchmark notebooks and plots
-- Seed dataset for crawl initialization
+- Ray-based parallel PageRank implementations
+- Sequential baseline PageRank for performance comparison
+- Graph utility functions to build Compressed Sparse Row (CSR) representations
+- Jupyter notebook with full benchmarking sweeps, degree distribution analysis, and visualizations
+- Analytical results regarding Amdahl's Law and parallel efficiency
 
 ## Dataset
-The crawler seeds are sampled from majestic_million.csv in the project root.
-
-Source of dataset:
-- Majestic Million report: https://majestic.com/reports/majestic-million
+The PageRank algorithm processes a directed web graph (`crawl_graph.json`) generated from previous crawling stages.
+- **Total Nodes**: ~1,573,482
+- **Total Directed Edges**: ~7,598,137
+- **Graph Format**: JSON adjacency list converted to CSR (indptr, indices, out_counts) arrays to optimize memory and access speed.
 
 ## Experimented Techniques
-### 1) Sequential
-Single-process async crawler used as the baseline.
+### 1) Sequential PageRank
+A standard iterative approach running on a single thread. Used to establish the baseline execution time and rank correctness.
 
-### 2) Ray Master-Worker
-Centralized coordination:
-- One master actor holds global queue, visited set, and graph
-- Multiple workers fetch and return discovered links
+### 2) Centralized Aggregation (Ray)
+- **Coordination**: The driver collects all worker results each iteration via `ray.get()`.
+- **Data Handling**: CSR structures are pushed to the Ray object store. Workers read from a shared memory-mapped file (`pagerank.dat`).
+- **Trade-off**: Simpler to implement but incurs high communication overhead (~96% of total time) due to the centralized bottleneck.
 
-### 3) Ray Peer-to-Peer
-Decentralized coordination:
-- Workers own partitions of URL space
-- Workers exchange discovered links directly
-- Final graph is merged after execution
+### 3) Distributed Reduction (Ray)
+- **Coordination**: Uses a tree-reduction strategy to merge partial results in Ray worker tasks. Only the final merged root result crosses the object store to the driver.
+- **Trade-off**: Significantly reduces communication overhead (to ~0%) and scales better for larger graphs and higher worker counts.
+
+## Termination Policies
+Each strategy is evaluated under two conditions:
+1. **Fixed Iteration Count**: Always runs exactly `FIXED_ITERS` (e.g., 25). Useful for strict wall-clock budgeting and reproducibility.
+2. **Convergence-Based**: Stops when the maximum absolute difference in ranks between iterations falls below a `TOLERANCE` threshold (e.g., 1e-6). Saves unnecessary work (e.g., converging in 11 iterations) and ensures rank quality.
 
 ## Important Comparison Notes (Correctness and Fairness)
-To avoid misleading conclusions, keep these points in mind:
-- Hyperparameter grids are mostly aligned, but not identical across all runs.
-- In current experiments, Sequential includes depth 3, while Ray sweeps may run only up to depth 2 in some notebooks/scripts.
-- max_per_domain exists in all approaches, but enforcement semantics differ:
-  - Sequential and Master-Worker apply a global-style domain cap.
-  - Peer-to-Peer applies routing-time/local checks, which may behave less strictly than a single global counter.
-
-Because of these differences, comparisons are strongest when filtered to exactly matching settings (same seeds, depth, and worker assumptions).
-
-## Project Structure
-- basic.py: initial baseline crawler prototype
-- majestic_million.csv: seed domain dataset
-- Milestone1.md: milestone documentation notes
-- requirements.txt: Python dependencies
-- Asyncio/
-  - async.py
-  - Milestone1_Asyncio.py
-  - Milestone1_Asyncio_Mod.py
-  - ASYNCIO_GUIDE.md
-- Ray/
-  - raymasterworker.py
-  - raypeertopeer.py
-  - Ray_Overview.md
-- Notebooks/
-  - crawler_benchmark.ipynb
-  - notebook662de1dc8b (1).ipynb
-  - notebook662de1dc8b (2).ipynb
+- All three algorithms produce identical PageRank scores and top-page rankings (within a floating-point tolerance of `1e-5`).
+- **Communication Overhead**: Centralized aggregation scales poorly due to O(W) communication, while distributed reduction uses O(log W) communication.
+- **Hardware Context**: Tuned for a 4 physical core / 8 logical processor environment. Performance speedups (~1.35x) reflect this constraint but demonstrate parallel viability.
 
 ## Quick Start
 1. Create and activate a Python environment.
 2. Install dependencies:
-   pip install -r requirements.txt
-3. Ensure majestic_million.csv is present in the root directory.
-4. Run scripts or notebooks for experiments.
-
-## Running Milestone 1 Experiments
-Recommended:
-- Use the notebooks in Notebooks/ for benchmark sweeps and visualizations.
-- Use Ray scripts in Ray/ for direct architecture runs.
-
-Typical outputs include:
-- elapsed time
-- URLs crawled
-- edge counts
-- throughput (URLs/second)
-- saved benchmark figures
-
-## Reproducibility Tips
-- Keep random seeds fixed when sampling domains.
-- Run with comparable depth and seed counts across techniques.
-- Keep machine load stable between runs.
-- Reinitialize Ray cleanly between independent benchmark sweeps.
-
-## Notes
-This repository includes additional exploratory files beyond strict Milestone 1 requirements (especially Asyncio variants), which are useful for understanding design trade-offs and performance behavior.
+   ```bash
+   pip install ray numpy pandas matplotlib
