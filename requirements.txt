@@ -4,6 +4,7 @@ lxml
 matplotlib
 networkx
 pandas
+numpy
 ray
 requests
 selectolax
